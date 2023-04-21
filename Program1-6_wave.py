@@ -20,6 +20,7 @@ def mMATp(n1z, n2z, n1, n2):
                 ])
 
 
+# 位相の計算
 def matFAI(n1z, d1, k0):
     return matrix([[exp(1j * n1z * k0 * d1), 0],
                    [0, exp(-1j * n1z * k0 * d1)]])
@@ -84,22 +85,28 @@ n2z = n2 * c2
 n3z = n3 * c3
 n4z = n4 * c4
 n5z = n5 * c5
+print("n1z.shape is", n1z.shape)
 
+# S偏光
 mMats21 = zeros((WL_points, 2, 2), dtype="complex")  # 3次元配列になっている
 mMats32 = zeros((WL_points, 2, 2), dtype="complex")
 mMats43 = zeros((WL_points, 2, 2), dtype="complex")
 mMats54 = zeros((WL_points, 2, 2), dtype="complex")
+mMats_array = zeros((layer_num, WL_points, 2, 2), dtype="complex")  # 4次元配列()
 
+# P偏光
 mMatp21 = zeros((WL_points, 2, 2), dtype="complex")
 mMatp32 = zeros((WL_points, 2, 2), dtype="complex")
 mMatp43 = zeros((WL_points, 2, 2), dtype="complex")
 mMatp54 = zeros((WL_points, 2, 2), dtype="complex")
 
+# 位相
 matFAI2 = zeros((WL_points, 2, 2), dtype="complex")
 matFAI3 = zeros((WL_points, 2, 2), dtype="complex")
 matFAI4 = zeros((WL_points, 2, 2), dtype="complex")
+matFAI_array = zeros((layer_num, WL_points, 2, 2), dtype="complex")  # 4次元配列()
 
-print(matFAI2.shape)
+print("matFAI2.shape is", matFAI2.shape)
 
 matTs = zeros((WL_points, 2, 2), dtype="complex")
 matTp = zeros((WL_points, 2, 2), dtype="complex")
@@ -122,13 +129,20 @@ for i in range(WL_points):
     # matFAI2[i] = matFAI(n2z[i], d2, k0[i])
     # matFAI3[i] = matFAI(n3z[i], d3, k0[i])
     # matFAI4[i] = matFAI(n4z[i], d4, k0[i])
-    # for j in range(2, layer_num):
     matFAI2[i] = matFAI(n2z[i], distance[1], k0[i])
     matFAI3[i] = matFAI(n3z[i], distance[2], k0[i])
     matFAI4[i] = matFAI(n4z[i], distance[3], k0[i])
+    matFAI_array[1][i] = matFAI(n2z[i], distance[1], k0[i])
+    matFAI_array[2][i] = matFAI(n3z[i], distance[2], k0[i])
+    matFAI_array[3][i] = matFAI(n4z[i], distance[3], k0[i])
 
-    matTs[i] = mMats54[i] @ matFAI4[i] @ mMats43[i] @ matFAI3[i] \
-        @ mMats32[i] @ matFAI2[i] @ mMats21[i]
+    # for j in range(2, layer_num):
+
+    # matTs[i] = mMats54[i] @ matFAI4[i] @ mMats43[i] @ matFAI3[i] \
+    #    @ mMats32[i] @ matFAI2[i] @ mMats21[i]
+    matTs[i] = mMats54[i] @ matFAI_array[3][i] @ mMats43[i] \
+        @ matFAI_array[2][i] @ mMats32[i] @ matFAI_array[1][i] @ mMats21[i]
+    
     matTp[i] = mMatp54[i] @ matFAI4[i] @ mMatp43[i] @ matFAI3[i] \
         @ mMatp32[i] @ matFAI2[i] @ mMatp21[i]
 
