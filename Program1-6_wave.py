@@ -40,10 +40,8 @@ n2 = full(WL_points, 1.38)
 n3 = full(WL_points, 2.10)
 n4 = full(WL_points, 1.63)
 n5 = full(WL_points, 1.52)
-index = array([n1, n2, n3, n4, n5])  # 総数、波長の２Dマトリックス
-print(index.shape)
-print(index[0][0])
-
+index = array([n1, n2, n3, n4, n5])  # 層数、波長の２Dマトリックス
+print("index.shape is", index.shape)
 
 ep1 = n1 ** 2
 ep2 = n2 ** 2
@@ -54,7 +52,6 @@ ep5 = n5 ** 2
 ep = index ** 2
 print(ep.shape)
 print(ep[0][0])
-
 
 d2 = 99.64
 d3 = 130.95
@@ -67,7 +64,6 @@ distance[3] = d4
 # t1Deg = linspace(t1start, t1end, t1points)
 t1Deg = 10
 t1 = t1Deg / 180 * pi
-# t2 = arcsin((n1 / n2) * sin(t1))
 
 s1 = n1 * sin(t1)  # sin(t1)
 c1 = n1 * cos(t1)  # cos(t1)
@@ -80,12 +76,38 @@ c4 = sqrt(1 - s4**2)
 s5 = s1 / n5
 c5 = sqrt(1 - s5**2)
 
+# ここから追記
+# 値が同じになるか確認は必要！！！
+# s_array = index  # arrayの形を合わせる
+# c_array = index  # arrayの形を合わせる
+s_array = zeros((layer_num, WL_points))  # arrayの形を合わせる
+c_array = zeros((layer_num, WL_points))  # arrayの形を合わせる
+
+# これだと参照になってオリジナルのindexの値が変化してしまうのでちょっと修正必要　☆☆☆
+s_array[0] = index[0] * sin(t1)
+c_array[0] = index[0] * cos(t1)
+s_array[1] = s_array[0] / index[1]
+c_array[1] = sqrt(1 - s_array[1] ** 2)
+s_array[2] = s_array[0] / index[2]
+c_array[2] = sqrt(1 - s_array[2] ** 2)
+s_array[3] = s_array[0] / index[3]
+c_array[3] = sqrt(1 - s_array[3] ** 2)
+s_array[4] = s_array[0] / index[4]
+c_array[4] = sqrt(1 - s_array[4] ** 2)
+
+
 n1z = n1 * c1
 n2z = n2 * c2
 n3z = n3 * c3
 n4z = n4 * c4
 n5z = n5 * c5
 print("n1z.shape is", n1z.shape)
+nz_array = zeros((layer_num, WL_points))
+nz_array[0] = index[0] * c_array[0]
+nz_array[1] = index[1] * c_array[1]
+nz_array[2] = index[2] * c_array[2]
+nz_array[3] = index[3] * c_array[3]
+nz_array[4] = index[4] * c_array[4]
 
 # S偏光
 mMats21 = zeros((WL_points, 2, 2), dtype="complex")  # 3次元配列になっている
@@ -132,19 +154,27 @@ for i in range(WL_points):
     matFAI2[i] = matFAI(n2z[i], distance[1], k0[i])
     matFAI3[i] = matFAI(n3z[i], distance[2], k0[i])
     matFAI4[i] = matFAI(n4z[i], distance[3], k0[i])
+    
+    """
     matFAI_array[1][i] = matFAI(n2z[i], distance[1], k0[i])
     matFAI_array[2][i] = matFAI(n3z[i], distance[2], k0[i])
     matFAI_array[3][i] = matFAI(n4z[i], distance[3], k0[i])
-
-    # for j in range(2, layer_num):
-
+    """
+    
+    # for j in range(1, layer_num):
+    matFAI_array[1][i] = matFAI(nz_array[1][i], distance[1], k0[i])
+    matFAI_array[2][i] = matFAI(nz_array[2][i], distance[2], k0[i])
+    matFAI_array[3][i] = matFAI(nz_array[3][i], distance[3], k0[i])
+       
     # matTs[i] = mMats54[i] @ matFAI4[i] @ mMats43[i] @ matFAI3[i] \
     #    @ mMats32[i] @ matFAI2[i] @ mMats21[i]
     matTs[i] = mMats54[i] @ matFAI_array[3][i] @ mMats43[i] \
         @ matFAI_array[2][i] @ mMats32[i] @ matFAI_array[1][i] @ mMats21[i]
     
-    matTp[i] = mMatp54[i] @ matFAI4[i] @ mMatp43[i] @ matFAI3[i] \
-        @ mMatp32[i] @ matFAI2[i] @ mMatp21[i]
+    # matTp[i] = mMatp54[i] @ matFAI4[i] @ mMatp43[i] @ matFAI3[i] \
+    #    @ mMatp32[i] @ matFAI2[i] @ mMatp21[i]
+    matTp[i] = mMatp54[i] @ matFAI_array[3][i] @ mMatp43[i] \
+        @ matFAI_array[2][i] @ mMatp32[i] @ matFAI_array[1][i] @ mMatp21[i]
 
     rs[i] = -matTs[i, 1, 0] / matTs[i, 1, 1]
     rp[i] = -matTp[i, 1, 0] / matTp[i, 1, 1]
