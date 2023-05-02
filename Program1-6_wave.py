@@ -36,7 +36,7 @@ k0 = 2 * pi / WL
 
 # n1空気、n2,n3,n4 膜、n5基材
 
-layer_num = 5
+layer_num = 24 + 2
 """
 n1 = full(WL_points, 1.0)
 n2 = full(WL_points, 1.38)
@@ -47,9 +47,31 @@ index = array([n1, n2, n3, n4, n5])  # 層数、波長の2Dマトリックス
 """
 # この入力形式で屈折率を入れていく
 index = array([full(WL_points, 1.0),
-               full(WL_points, 1.38),
-               full(WL_points, 2.10),
-               full(WL_points, 1.63),
+               # full(WL_points, 1.38),  # 1.38
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
+               full(WL_points, 1.46),  # 2.10
+               full(WL_points, 2.30),  # 1.63
                full(WL_points, 1.52)])
 print("index.shape is", index.shape)
 
@@ -75,13 +97,37 @@ distance[3] = d4
 """
 # distance は手動で入れざる負えない
 distance = array([nan,
-                  99.64,
-                  130.95,
-                  84.35,
+                  # 50 / 1.38,  # 99.64
+                  # 50 / 1.38,  # 130.95
+                  # 37.5 / 1.38,  # 84.35
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
+                  137.5 / 1.46,
+                  137.5 / 2.30,
                   nan])
 
 # t1Deg = linspace(t1start, t1end, t1points)
-t1Deg = 35
+t1Deg = 0
 t1 = t1Deg / 180 * pi
 
 """
@@ -268,7 +314,7 @@ title("Reflectivity", fontsize=18)
 legend(fontsize=20, loc='lower right')
 grid(True)
 
-axis([300, 999, 0, 0.2])
+axis([300, 999, 0, 1.2])
 
 tight_layout()
 show()
