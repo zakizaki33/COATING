@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from numpy import zeros, linspace, full, exp, sin, cos, array
+from numpy import zeros, linspace, full, exp, sin, cos, array, nan, eye
 from scipy import pi, matrix
 from numpy.lib.scimath import sqrt
 from matplotlib.pyplot import (plot, show, xlabel, ylabel, title, legend,
@@ -35,13 +35,22 @@ WL = linspace(WL_start, WL_end, WL_points)
 k0 = 2 * pi / WL
 
 # n1空気、n2,n3,n4 膜、n5基材
+
 layer_num = 5
+"""
 n1 = full(WL_points, 1.0)
 n2 = full(WL_points, 1.38)
 n3 = full(WL_points, 2.10)
 n4 = full(WL_points, 1.63)
 n5 = full(WL_points, 1.52)
-index = array([n1, n2, n3, n4, n5])  # 層数、波長の２Dマトリックス
+index = array([n1, n2, n3, n4, n5])  # 層数、波長の2Dマトリックス
+"""
+# この入力形式で屈折率を入れていく
+index = array([full(WL_points, 1.0),
+               full(WL_points, 1.38),
+               full(WL_points, 2.10),
+               full(WL_points, 1.63),
+               full(WL_points, 1.52)])
 print("index.shape is", index.shape)
 
 """
@@ -55,6 +64,7 @@ ep = index ** 2
 print("ep.shape is", ep.shape)
 """
 
+""""
 d2 = 99.64
 d3 = 130.95
 d4 = 84.35
@@ -62,9 +72,16 @@ distance = zeros(layer_num)
 distance[1] = d2
 distance[2] = d3
 distance[3] = d4
+"""
+# distance は手動で入れざる負えない
+distance = array([nan,
+                  99.64,
+                  130.95,
+                  84.35,
+                  nan])
 
 # t1Deg = linspace(t1start, t1end, t1points)
-t1Deg = 25
+t1Deg = 35
 t1 = t1Deg / 180 * pi
 
 """
@@ -83,6 +100,7 @@ c5 = sqrt(1 - s5**2)
 s_array = zeros((layer_num, WL_points))  # arrayの形を合わせる
 c_array = zeros((layer_num, WL_points))  # arrayの形を合わせる
 
+"""
 s_array[0] = index[0] * sin(t1)
 c_array[0] = index[0] * cos(t1)
 s_array[1] = s_array[0] / index[1]
@@ -93,6 +111,15 @@ s_array[3] = s_array[0] / index[3]
 c_array[3] = sqrt(1 - s_array[3] ** 2)
 s_array[4] = s_array[0] / index[4]
 c_array[4] = sqrt(1 - s_array[4] ** 2)
+"""
+
+for i in range(layer_num):
+    if (i == 0):
+        s_array[i] = index[i] * sin(t1)
+        c_array[i] = index[i] * cos(t1)
+    
+    s_array[i] = s_array[0] / index[i]
+    c_array[i] = sqrt(1 - s_array[i] ** 2)
 
 
 # n1z = n1 * c1
@@ -102,11 +129,14 @@ c_array[4] = sqrt(1 - s_array[4] ** 2)
 # n5z = n5 * c5
 # print("n1z.shape is", n1z.shape)
 nz_array = zeros((layer_num, WL_points))
-nz_array[0] = index[0] * c_array[0]
-nz_array[1] = index[1] * c_array[1]
-nz_array[2] = index[2] * c_array[2]
-nz_array[3] = index[3] * c_array[3]
-nz_array[4] = index[4] * c_array[4]
+# nz_array[0] = index[0] * c_array[0]
+# nz_array[1] = index[1] * c_array[1]
+# nz_array[2] = index[2] * c_array[2]
+# nz_array[3] = index[3] * c_array[3]
+# nz_array[4] = index[4] * c_array[4]
+
+for i in range(0, layer_num):
+    nz_array[i] = index[i] * c_array[i]
 
 # S偏光
 # mMats21 = zeros((WL_points, 2, 2), dtype="complex")  # 3次元配列になっている
@@ -122,12 +152,15 @@ mMats_array = zeros((layer_num, WL_points, 2, 2), dtype="complex")  # 4次元配
 # mMatp54 = zeros((WL_points, 2, 2), dtype="complex")
 mMatp_array = zeros((layer_num, WL_points, 2, 2), dtype="complex")  # 4次元配列()
 
+
 # 位相
 # matFAI2 = zeros((WL_points, 2, 2), dtype="complex")
 # matFAI3 = zeros((WL_points, 2, 2), dtype="complex")
 # matFAI4 = zeros((WL_points, 2, 2), dtype="complex")
 matFAI_array = zeros((layer_num, WL_points, 2, 2), dtype="complex")  # 4次元配列()
 print("matFAI_array.shape is", matFAI_array.shape)
+# 最初の要素だけは単位行列にしておく
+matFAI_array[0] = eye(2)
 
 matTs = zeros((WL_points, 2, 2), dtype="complex")
 matTp = zeros((WL_points, 2, 2), dtype="complex")
@@ -194,17 +227,29 @@ for i in range(WL_points):
 
     # matTs[i] = mMats54[i] @ matFAI4[i] @ mMats43[i] @ matFAI3[i] \
     #    @ mMats32[i] @ matFAI2[i] @ mMats21[i]
+    """
     matTs[i] = mMats_array[3][i] @ matFAI_array[3][i] \
         @ mMats_array[2][i] @ matFAI_array[2][i] \
         @ mMats_array[1][i] @ matFAI_array[1][i] \
-        @ mMats_array[0][i]
-    
+        @ mMats_array[0][i] @ matFAI_array[0][i]
+    """
+
+    matTs[i] = eye(2)  # 一旦単位行列に
+    for j in range(0, layer_num - 1):
+        matTs[i] = mMats_array[j][i] @ matFAI_array[j][i] @ matTs[i]
+
     # matTp[i] = mMatp54[i] @ matFAI4[i] @ mMatp43[i] @ matFAI3[i] \
     #    @ mMatp32[i] @ matFAI2[i] @ mMatp21[i]
+    '''
     matTp[i] = mMatp_array[3][i] @ matFAI_array[3][i] \
         @ mMatp_array[2][i] @ matFAI_array[2][i] \
         @ mMatp_array[1][i] @ matFAI_array[1][i] \
         @ mMatp_array[0][i]
+    '''
+
+    matTp[i] = eye(2)  # 一旦単位行列に
+    for j in range(0, layer_num - 1):
+        matTp[i] = mMatp_array[j][i] @ matFAI_array[j][i] @ matTp[i]
     
     rs[i] = -matTs[i, 1, 0] / matTs[i, 1, 1]
     rp[i] = -matTp[i, 1, 0] / matTp[i, 1, 1]
