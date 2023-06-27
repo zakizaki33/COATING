@@ -5,6 +5,10 @@ from numpy.lib.scimath import sqrt
 from matplotlib.pyplot import (plot, show, xlabel, ylabel, title, legend,
                                grid, axis, tight_layout)
 
+# プルリクエストを練習するために関数を追加する
+
+def add10(a):
+    return a+10
 
 # S偏光の境界条件
 def mMATs(n1z, n2z):
@@ -155,3 +159,9 @@ axis([300, 999, 0, 1.2])
 
 tight_layout()
 show()
+
+
+# add10を使う
+a =999
+b =add10(999)
+print("add10を使う", b)
