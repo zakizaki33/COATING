@@ -5,6 +5,10 @@ from numpy.lib.scimath import sqrt
 from matplotlib.pyplot import (plot, show, xlabel, ylabel, title, legend,
                                grid, axis, tight_layout)
 
+# プルリクエストを練習するために関数を追加する
+
+def add10(a):
+    return a+10
 
 # S偏光の境界条件
 def mMATs(n1z, n2z):
@@ -40,7 +44,6 @@ layer_num = 24 + 2
 
 # この入力形式で屈折率を入れていく
 index = array([full(WL_points, 1.0),
-               # full(WL_points, 1.38),  # 1.38
                full(WL_points, 1.46),  # 2.10
                full(WL_points, 2.30),  # 1.63
                full(WL_points, 1.46),  # 2.10
@@ -68,36 +71,9 @@ index = array([full(WL_points, 1.0),
                full(WL_points, 1.52)])
 print("index.shape is", index.shape)
 
-# distance は手動で入れざる負えない
-distance = array([nan,
-                  # 50 / 1.38,  # 99.64
-                  # 50 / 1.38,  # 130.95
-                  # 37.5 / 1.38,  # 84.35
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  137.5 / 1.46,
-                  137.5 / 2.30,
-                  nan])
+# distance の入れ方があまりスマートではない
+distance = zeros(layer_num)
+distance[1:25] = array([137.5 / 1.46, 137.5 / 2.30] *12)
 
 # t1Deg = linspace(t1start, t1end, t1points)
 t1Deg = 0
@@ -183,3 +159,9 @@ axis([300, 999, 0, 1.2])
 
 tight_layout()
 show()
+
+
+# add10を使う
+a =999
+b =add10(999)
+print("add10を使う", b)
