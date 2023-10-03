@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def vectr(d, a, r, R, n1, n2):  # 関数を定義
+def vectr(d, a, r, R, n1, n2):
     # d(xd yd zd) :方向ベクトル，a(xa ya za): 位置ベクトル，
     # r(xr yr zr) :球の中心 球の半径:R,屈折率:n1,n2
     # At^2+2Bt+C=0より
@@ -47,9 +47,13 @@ def vectr(d, a, r, R, n1, n2):  # 関数を定義
     hosen = hosen / (hosen[0]**2 + hosen[1]**2 + hosen[2]**2)**0.5
     # print(hosen)
     # print("法線ベクトル")
+    # 屈折ベクトル
     p1 = ((n1 / n2) * Dx - (n1 / n2) * (np.dot(Dx, hosen) + (
-        ((n2 / n1)**2 - 1 + ((np.dot(Dx, hosen))**2))**0.5))) * hosen  # 屈折ベクトル
+        ((n2 / n1)**2 - 1 + ((np.dot(Dx, hosen))**2))**0.5))) * hosen
 
+    # r 球の中心
+    # D 交点座標
+    # p1 屈折ベクトル
     return (r, D, p1)
 
     # P=np.min(P[:,2]>0)
@@ -77,6 +81,7 @@ for x in range(0, 99, 1):
 
     anglenumber = np.shape(D0[x])[0]
 
+    # レンズデータ
     data = np.array([(11.050, 1.74, 5.50),
                      (22.680, 1, 0.450),
                      (-29.530, 1.74, 0.850),
@@ -96,12 +101,14 @@ for x in range(0, 99, 1):
     list3 = np.zeros((number - 1, 3))  # 屈折ベクトル
     r1 = np.array((a0[0], a0[1], d0 + data[0, 0]))  # １面球の中心
 
-    # 0-1面のみ別計算
+    # 物体面から第1面までは別計算
     p1 = vectr(D0[x], a0, r1, data[0, 0], n0, data[0, 1])
     # print(p1)
     list1[0] = p1[0]  # 1面の球の中心
     list2[0] = p1[1]  # 1面の交点
     list3[0] = p1[2]  # 1面の屈折ベクトル
+
+    # 第1面以降の計算
     for i in range(0, number - 2, 1):
         rx = np.array((list1[i, 0],
                        list1[i, 1],
@@ -117,10 +124,13 @@ for x in range(0, 99, 1):
         list1[i + 1] = px[0]  # i面の球の中心
         list2[i + 1] = px[1]  # i面の交点
         list3[i + 1] = px[2]  # i面の屈折ベクトル
+    
+    print("i面の交点 x, y, z")
     print(list2)
-    print(list3)
+    # print(list3)
     # exit()
-
+    
+    # 球面収差の計算
     point[x] = list2[number - 2, :]
     ref_vector[x] = list3[number - 2, :]
 
@@ -131,10 +141,7 @@ for x in range(0, 99, 1):
 
 print(SCA)
 plt.plot(SCA)
-
-
 plt.show()
-
 
 # tracker=(list2,list3)
 
