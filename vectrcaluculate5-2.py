@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 def vectr(d, a, r, R, n1, n2):
@@ -58,8 +58,19 @@ def vectr(d, a, r, R, n1, n2):
 
     # P=np.min(P[:,2]>0)
 
-# ここにパラメータを入力
 
+# ここにパラメータを入力（axis=0方向:第i面　axis=1方向:曲率，屈折率，厚み）
+# レンズデータ
+data = np.array([(11.050, 1.74, 5.50),
+                 (22.680, 1, 0.450),
+                 (-29.530, 1.74, 0.850),
+                 (11.580, 1, 1.660),
+                 (27.530, 1.74, 1.600),
+                 (-18.100, 1, 46.700),
+                 (1000000, 1, 10000)],
+                float)
+# レンズ面の数
+number = np.shape(data)[0]
 
 # 0面
 point = np.zeros((99, 3), float)
@@ -80,20 +91,6 @@ for x in range(0, 99, 1):
     n0 = 1
 
     anglenumber = np.shape(D0[x])[0]
-
-    # レンズデータ
-    data = np.array([(11.050, 1.74, 5.50),
-                     (22.680, 1, 0.450),
-                     (-29.530, 1.74, 0.850),
-                     (11.580, 1, 1.660),
-                     (27.530, 1.74, 1.600),
-                     (-18.100, 1, 46.700),
-                     (1000000, 1, 10000)],
-                    # ここにパラメータを入力（axis=0方向:第i面　axis=1方向:曲率，屈折率，厚み）
-                    float)
-
-    number = np.shape(data)
-    number = number[0]  # 面の数
 
     # 数値置き場
     list1 = np.zeros((number - 1, 3))  # 球の中心
@@ -130,6 +127,7 @@ for x in range(0, 99, 1):
     # print(list3)
     # exit()
     
+    '''
     # 球面収差の計算
     point[x] = list2[number - 2, :]
     ref_vector[x] = list3[number - 2, :]
@@ -137,15 +135,15 @@ for x in range(0, 99, 1):
     zz[x] = ref_vector[x, 2] - ref_vector[0, 2]
     z_imagey[x] = np.dot(point[x, 2], point[x, 1]) / ref_vector[x, 2]
     SCA[x] = z_imagey[x] - zz[x]
+    '''
 
-
-print(SCA)
-plt.plot(SCA)
-plt.show()
+# print(SCA)
+# plt.plot(SCA)
+# plt.show()
 
 # tracker=(list2,list3)
 
-np.savetxt('球面収差.txt', SCA)
+# np.savetxt('球面収差.txt', SCA)
 # np.savetxt('光線追跡vector.txt',tracker[1])
 
 # 変更させてみる（やまざき　2023-10-04）
