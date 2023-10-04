@@ -147,3 +147,5 @@ plt.show()
 
 np.savetxt('球面収差.txt', SCA)
 # np.savetxt('光線追跡vector.txt',tracker[1])
+
+# 変更させてみる（やまざき　2023-10-04）
