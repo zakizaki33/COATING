@@ -1,6 +1,6 @@
 import numpy as np
 # import matplotlib.pyplot as plt
-import plotSCA
+import Functions
 
 
 def vectr(d, a, r, R, n1, n2):
@@ -139,45 +139,10 @@ for x in range(0, 99, 1):
     SCA[x] = z_imagey[x] - zz[x]
     '''
 
-# print(SCA)
-# plt.plot(SCA)
-# plt.show()
+# SCAを描画する
+# Functions.plotSCA(SCA)
 
 # tracker=(list2,list3)
-
 # np.savetxt('球面収差.txt', SCA)
 # np.savetxt('光線追跡vector.txt',tracker[1])
 
-# 変更させてみる（やまざき　2023-10-04）
-
-
-
-
-# テスト用のデータ
-data_ = [[-0.449887435,
-         -0.495653416,
-         -0.474286688,
-         -0.413830312,
-         -0.333848974,
-         -0.248263825,
-         -0.167080029,
-         -0.097470406,
-         -0.044466717,
-         -0.011400109,
-         0],
-         [1.0,
-         0.9,
-         0.8,
-         0.7,
-         0.6,
-         0.5,
-         0.4,
-         0.3,
-         0.2,
-         0.1,
-         0]]
-
-plotSCA.plotSCA(data_)
-
-# natsume20231005
-#natsume20231010
