@@ -81,8 +81,9 @@ z_imagey = np.zeros((99, 1), float)
 SCA = np.zeros((99, 1), float)
 D0 = np.zeros((99, 3), float)
 # deg=np.linspace(2.29244,2.29244,1)
-deg = np.linspace(0, 2.29244, 100)
 
+
+deg = np.linspace(0, 2.29244, 100) #画角の範囲（deg）
 
 for x in range(0, 99, 1):
     D0[x] = np.array((0, np.sin(deg[x] * np.pi / 180),
@@ -179,3 +180,4 @@ data_ = [[-0.449887435,
 plotSCA.plotSCA(data_)
 
 # natsume20231005
+#natsume20231010
