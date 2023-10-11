@@ -136,8 +136,8 @@ for x in range(0, 99, 1):
     ref_vector[x] = list3[number - 2, :] #（像面-1）面の屈折ベクトル
 
     zz[x] = point[x, 2] - point[0, 2]# z補正
-    z_imagey[x] = np.dot(point[x, 1], ref_vector[x, 1]) / ref_vector[x, 2]- zz[x]
-    SCA[x] = z_imagey[x] - z_imagey[0]
+    z_imagey[x] = np.dot(point[x, 1], ref_vector[x, 1]) / ref_vector[x, 2]- zz[x] #中心軸交点
+    SCA[x] = z_imagey[x] - z_imagey[0] # 球面収差
 
     
 
