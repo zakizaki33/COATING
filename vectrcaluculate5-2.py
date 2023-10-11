@@ -1,5 +1,4 @@
 import numpy as np
-# import matplotlib.pyplot as plt
 import Functions
 
 
@@ -14,7 +13,7 @@ def vectr(d, a, r, R, n1, n2):
 
     if B**2 - A * C < 0:
         #print(B**2 - A * C)
-        #print("解なし")
+        print("解なし エラー発生")
         exit()
     else:
         t = np.array(((-B + (B**2 - A * C)**0.5) / A,
@@ -60,8 +59,11 @@ def vectr(d, a, r, R, n1, n2):
     # P=np.min(P[:,2]>0)
 
 
-# ここにパラメータを入力（axis=0方向:第i面　axis=1方向:曲率，屈折率，厚み）
 # レンズデータ
+a0 = np.array((0, 0, 0))
+d0 = 100
+n0 = 1
+# ここにパラメータを入力（axis=0方向:第i面　axis=1方向:曲率，屈折率，厚み）
 data = np.array([(11.050, 1.74, 5.50),
                  (22.680, 1, 0.450),
                  (-29.530, 1.74, 0.850),
@@ -73,6 +75,11 @@ data = np.array([(11.050, 1.74, 5.50),
 # レンズ面の数
 number = np.shape(data)[0]
 
+# 数値置き場
+list1 = np.zeros((number - 1, 3))  # 球の中心
+list2 = np.zeros((number - 1, 3))  # 交点
+list3 = np.zeros((number - 1, 3))  # 屈折ベクトル
+
 #収差計算に関するパラメータを入れる枠
 point = np.zeros((99, 3), float)  # 交点(像面-1 面)
 ref_vector = np.zeros((99, 3), float) # 屈折ベクトル（像面-1 面）
@@ -82,26 +89,17 @@ D0 = np.zeros((99, 3), float) # 画角
 SCA = np.zeros((99, 1), float) # 球面収差
 
 # deg=np.linspace(2.29244,2.29244,1)
-
-
 deg = np.linspace(0, 2.29244, 100) #画角の範囲（deg）
 
 for x in range(0, 99, 1):
     D0[x] = np.array((0, np.sin(deg[x] * np.pi / 180),
                       np.cos(deg[x] * np.pi / 180)))  # 画角
-    a0 = np.array((0, 0, 0))
-    d0 = 100
-    n0 = 1
 
-    anglenumber = np.shape(D0[x])[0]
-
-    # 数値置き場
-    list1 = np.zeros((number - 1, 3))  # 球の中心
-    list2 = np.zeros((number - 1, 3))  # 交点
-    list3 = np.zeros((number - 1, 3))  # 屈折ベクトル
-    r1 = np.array((a0[0], a0[1], d0 + data[0, 0]))  # １面球の中心
+    # 使っているようには見受けられない
+    # anglenumber = np.shape(D0[x])[0]
 
     # 物体面から第1面までは別計算
+    r1 = np.array((a0[0], a0[1], d0 + data[0, 0]))  # １面球の中心
     p1 = vectr(D0[x], a0, r1, data[0, 0], n0, data[0, 1])
     # print(p1)
     list1[0] = p1[0]  # 1面の球の中心
