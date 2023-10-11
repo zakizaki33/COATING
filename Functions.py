@@ -5,18 +5,25 @@ import numpy as np
 def plotSCA(data_X):
     """
     1次元データの散布図をプロットする関数
-
-    :param data: 1次元データ(リストまたは配列)
+    data_X : 1次元データ(リストまたは配列)
     SCAは次の形で関数に入ってくる(要素数は99)
     SCA = np.zeros((99, 1), float)
+    球面収差のスケールはいまは-1~+1で固定. imshowのextentで変更
     """
 
     # フィギュアを作成し、サイズを設定（縦横比1：2）
-    plt.figure(figsize=(3, 6))
+    plt.figure(figsize=(6, 6))
 
     # Xのデータを準備
     data_Y = np.linspace(0, 1, 99)
 
+    # グラフデザイン　パターンA
+    # print(plt.style.available)
+    # plt.style.use('Solarize_Light2')
+    # plt.style.use('fast')
+
+    # グラフデザイン　パターンB
+    
     # 背景に白黒のグラデーションを描画
     gradient = np.linspace(0, 1, 100).reshape(1, -1)
     plt.imshow(np.vstack((gradient, gradient)),
@@ -24,15 +31,14 @@ def plotSCA(data_X):
                extent=[-1, 1, 0, 1],
                aspect='auto',
                alpha=0.2)
-
+    
     # 散布図をプロット
     # plt.scatter(data, range(len(data)),)
-    # plt.scatter(data[0], data[1])
-    # plt.plot(data[0], data[1], marker='o', linestyle='-')
     plt.plot(data_X, data_Y, marker='o', linestyle='-')
 
     # グリッドを有効にする
     plt.grid(True)
+   
 
     # グラフのタイトルと軸ラベルを設定
     plt.title("SCA")
@@ -44,7 +50,6 @@ def plotSCA(data_X):
 
 
 # テスト用のデータ
-
 data_X = np.flip([-0.449887435,
                  -0.495653416,
                  -0.474286688,
