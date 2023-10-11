@@ -73,13 +73,14 @@ data = np.array([(11.050, 1.74, 5.50),
 # レンズ面の数
 number = np.shape(data)[0]
 
-# 0面
-point = np.zeros((99, 3), float)
-ref_vector = np.zeros((99, 3), float)
-zz = np.zeros((99, 1), float)
-z_imagey = np.zeros((99, 1), float)
-SCA = np.zeros((99, 1), float)
-D0 = np.zeros((99, 3), float)
+#収差計算に関するパラメータを入れる枠
+point = np.zeros((99, 3), float)  # 交点(像面-1面)
+ref_vector = np.zeros((99, 3), float) # 屈折ベクトル（像面-1面）
+zz = np.zeros((99, 1), float) # z補正
+z_imagey = np.zeros((99, 1), float) # 中心軸との交点　（z座標）
+D0 = np.zeros((99, 3), float) # 画角
+SCA = np.zeros((99, 1), float) # 球面収差
+
 # deg=np.linspace(2.29244,2.29244,1)
 
 
