@@ -13,8 +13,8 @@ def vectr(d, a, r, R, n1, n2):
     # print(A,B,C)
 
     if B**2 - A * C < 0:
-        print(B**2 - A * C)
-        print("解なし")
+        #print(B**2 - A * C)
+        #print("解なし")
         exit()
     else:
         t = np.array(((-B + (B**2 - A * C)**0.5) / A,
@@ -74,10 +74,10 @@ data = np.array([(11.050, 1.74, 5.50),
 number = np.shape(data)[0]
 
 #収差計算に関するパラメータを入れる枠
-point = np.zeros((99, 3), float)  # 交点(像面-1面)
-ref_vector = np.zeros((99, 3), float) # 屈折ベクトル（像面-1面）
+point = np.zeros((99, 3), float)  # 交点(像面-1 面)
+ref_vector = np.zeros((99, 3), float) # 屈折ベクトル（像面-1 面）
 zz = np.zeros((99, 1), float) # z補正
-z_imagey = np.zeros((99, 1), float) # 中心軸との交点　（z座標）
+z_imagey = np.zeros((99, 1), float) # 中心軸との交点　（像面付近）
 D0 = np.zeros((99, 3), float) # 画角
 SCA = np.zeros((99, 1), float) # 球面収差
 
@@ -130,20 +130,21 @@ for x in range(0, 99, 1):
     # print(list3)
     # exit()
     
-    '''
+    
     # 球面収差の計算
-    point[x] = list2[number - 2, :]
-    ref_vector[x] = list3[number - 2, :]
+    point[x] = list2[number - 2, :] #（像面-1）面の交点
+    ref_vector[x] = list3[number - 2, :] #（像面-1）面の屈折ベクトル
 
-    zz[x] = ref_vector[x, 2] - ref_vector[0, 2]
-    z_imagey[x] = np.dot(point[x, 2], point[x, 1]) / ref_vector[x, 2]
-    SCA[x] = z_imagey[x] - zz[x]
-    '''
+    zz[x] = point[x, 2] - point[0, 2]# z補正
+    z_imagey[x] = np.dot(point[x, 1], ref_vector[x, 1]) / ref_vector[x, 2]- zz[x]
+    SCA[x] = z_imagey[x] - z_imagey[0]
+
+    
 
 # SCAを描画する
-# Functions.plotSCA(SCA)
+Functions.plotSCA(SCA)
 
-# tracker=(list2,list3)
-# np.savetxt('球面収差.txt', SCA)
-# np.savetxt('光線追跡vector.txt',tracker[1])
+tracker=(list2,list3)
+np.savetxt('球面収差.txt', SCA)
+np.savetxt('光線追跡vector.txt',tracker[1])
 
