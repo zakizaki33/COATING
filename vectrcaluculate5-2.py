@@ -125,7 +125,7 @@ for x in range(0, 99, 1): #画角を0-2.29244 deg振る
         list2[i + 1] = px[1]  # i面の交点
         list3[i + 1] = px[2]  # i面の屈折ベクトル
     
-    print("i面の交点 x, y, z")
+    print("Surface", i+1, "Intersection Point (x, y, z):")
     print(list2)
     # print(list3)
     # exit()
