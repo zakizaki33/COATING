@@ -88,12 +88,14 @@ z_imagey = np.zeros((99, 1), float) # 中心軸との交点　（像面付近）
 D0 = np.zeros((99, 3), float) # 画角
 SCA = np.zeros((99, 1), float) # 球面収差
 
-# deg=np.linspace(2.29244,2.29244,1)
-deg = np.linspace(0, 2.29244, 100) #画角の範囲（deg）
+deg=np.linspace(0,2.29244,100)
+# deg = np.linspace(0, 0.2, 100) #画角の範囲（deg）
 
-for x in range(0, 99, 1):
-    D0[x] = np.array((0, np.sin(deg[x] * np.pi / 180),
-                      np.cos(deg[x] * np.pi / 180)))  # 画角
+for x in range(0, 99, 1): #画角を0-2.29244 deg振る
+    D0[x] = np.array((0, np.sin(np.radians(deg[x])),
+                      np.cos(np.radians(deg[x]))))  # 画角
+    
+    
 
     # 使っているようには見受けられない
     # anglenumber = np.shape(D0[x])[0]
