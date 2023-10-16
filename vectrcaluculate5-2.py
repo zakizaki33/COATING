@@ -16,8 +16,10 @@ def vectr(d, a, r, R, n1, n2):
         print("解なし エラー発生")
         exit()
     else:
-        t = np.array(((-B + (B**2 - A * C)**0.5) / A,
-                      (-B - (B**2 - A * C)**0.5) / A), float)
+        # t = np.array(((-B + (B**2 - A * C)**0.5) / A,
+        #               (-B - (B**2 - A * C)**0.5) / A), float)
+        
+        t = np.array(((-B + (B**2 - A * C)**0.5) / A, (-B - (B**2 - A * C)**0.5) / A))
         # print(t)#ここでtの値が導出(解の公式より)
         # t=int(np.amin(t>0))
 
@@ -48,8 +50,11 @@ def vectr(d, a, r, R, n1, n2):
     # print(hosen)
     # print("法線ベクトル")
     # 屈折ベクトル
-    p1 = ((n1 / n2) * Dx - (n1 / n2) * (np.dot(Dx, hosen) + (
-        ((n2 / n1)**2 - 1 + ((np.dot(Dx, hosen))**2))**0.5))) * hosen
+    # 屈折ベクトルの（）の場所がズレていた。たぶん自分がコードを綺麗にしている途中で書き間違えた
+    # p1_ = ((n1 / n2) * Dx - (n1 / n2) * (np.dot(Dx, hosen) + (((n2 / n1)**2 - 1 + ((np.dot(Dx, hosen))**2))**0.5))) * hosen
+
+    p1 = (n1 / n2) * Dx - (n1 / n2) * ((np.dot(Dx, hosen)) + (((n2 / n1)**2 - 1 + np.dot(Dx, hosen)**2)**0.5)) * hosen  # 屈折ベクトル
+
 
     # r 球の中心
     # D 交点座標
@@ -64,11 +69,11 @@ a0 = np.array((0, 0, 0))
 d0 = 100
 n0 = 1
 # ここにパラメータを入力（axis=0方向:第i面　axis=1方向:曲率，屈折率，厚み）
-data = np.array([(11.050, 1.74, 5.50),
+data = np.array([(11.050, 1.744003267, 5.50),
                  (22.680, 1, 0.450),
-                 (-29.530, 1.74, 0.850),
+                 (-29.530, 1.7400050237, 0.850),
                  (11.580, 1, 1.660),
-                 (27.530, 1.74, 1.600),
+                 (27.530, 1.744003267, 1.600),
                  (-18.100, 1, 46.700),
                  (1000000, 1, 10000)],
                 float)
@@ -76,9 +81,9 @@ data = np.array([(11.050, 1.74, 5.50),
 number = np.shape(data)[0]
 
 # 数値置き場
-list1 = np.zeros((number - 1, 3))  # 球の中心
-list2 = np.zeros((number - 1, 3))  # 交点
-list3 = np.zeros((number - 1, 3))  # 屈折ベクトル
+list1 = np.zeros((number - 0, 3))  # 球の中心
+list2 = np.zeros((number - 0, 3))  # 交点
+list3 = np.zeros((number - 0, 3))  # 屈折ベクトル
 
 #収差計算に関するパラメータを入れる枠
 point = np.zeros((99, 3), float)  # 交点(像面-1 面)
@@ -88,10 +93,10 @@ z_imagey = np.zeros((99, 1), float) # 中心軸との交点　（像面付近）
 D0 = np.zeros((99, 3), float) # 画角
 SCA = np.zeros((99, 1), float) # 球面収差
 
-deg=np.linspace(0,2.29244,100)
+deg=np.linspace(2.292442776,2.292442766,1)
 # deg = np.linspace(0, 0.2, 100) #画角の範囲（deg）
 
-for x in range(0, 99, 1): #画角を0-2.29244 deg振る
+for x in [0]: #range(0, 99, 1): #画角を0-2.29244 deg振る
     D0[x] = np.array((0, np.sin(np.radians(deg[x])),
                       np.cos(np.radians(deg[x]))))  # 画角
     
@@ -109,7 +114,7 @@ for x in range(0, 99, 1): #画角を0-2.29244 deg振る
     list3[0] = p1[2]  # 1面の屈折ベクトル
 
     # 第1面以降の計算
-    for i in range(0, number - 2, 1):
+    for i in range(0, number - 1, 1):
         rx = np.array((list1[i, 0],
                        list1[i, 1],
                        # i面の球の中心
@@ -125,7 +130,7 @@ for x in range(0, 99, 1): #画角を0-2.29244 deg振る
         list2[i + 1] = px[1]  # i面の交点
         list3[i + 1] = px[2]  # i面の屈折ベクトル
     
-    print("Surface", i+1, "Intersection Point (x, y, z):")
+    print("Surface Intersection Point (x, y, z):")
     print(list2)
     # print(list3)
     # exit()
