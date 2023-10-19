@@ -87,9 +87,11 @@ zz = np.zeros((99, 1), float)  # z補正
 z_imagey = np.zeros((99, 1), float)  # 中心軸との交点　（像面付近）
 D0 = np.zeros((99, 3), float)  # 画角
 SCA = np.zeros((99, 1), float)  # 球面収差
+SCA2 = np.zeros((99, 1), float)  # 球面収差
+
 
 # deg = np.linspace(2.292442776, 2.292442766, 1)
-deg = np.linspace(0, 2.292442776, 99)  # 画角の範囲（deg）
+deg = np.linspace(0.000001, 2.292442776, 99)  # 画角の範囲（deg）
 
 for j in range(0, 99, 1):  # [0]: #画角を0-2.29244 deg振る
     D0[j] = np.array((0, np.sin(np.radians(deg[j])),
@@ -135,13 +137,27 @@ for j in range(0, 99, 1):  # [0]: #画角を0-2.29244 deg振る
     ref_vector[j] = list3_ref_vector[number - 2, :]  # （像面-1）面の屈折ベクトル
 
     zz[j] = point[j, 2] - point[0, 2]  # z補正
-    z_imagey[j] = np.dot(point[j, 1],
-                         ref_vector[j, 1]) / ref_vector[j, 2] - zz[j]  # 中心軸交点
+    z_imagey[j] = np.dot(point[j, 1],ref_vector[j, 1]) / ref_vector[j, 2] - zz[j]  # 中心軸交点
     SCA[j] = z_imagey[j] - z_imagey[0]  # 球面収差
+
+    # 球面収差の計算その２
+    # value = point[j, 2]+ ref_vector[j,2]*point[j, 1]/abs(ref_vector[j,1])
+    # value_axis =point[0, 2]+ ref_vector[0,2]*point[0, 1]/abs(ref_vector[0,1])
+    # SCA2[j]=value- value_axis
 
     
 # SCAを描画する
+'''
+print(point[98])
+print(ref_vector[98])
+value = point[98, 2]+ ref_vector[98,2]*point[98, 1]/abs(ref_vector[98,1])
+value_axis =point[0, 2]+ ref_vector[0,2]*point[0, 1]/abs(ref_vector[0,1])
+SCA2[98]=value- value_axis
+'''
+
 Functions.plotSCA(SCA)
+# Functions.plotSCA(SCA2)
+
 
 tracker = (list2_cross_pos, list3_ref_vector)
 np.savetxt('球面収差.txt', SCA)
