@@ -22,30 +22,20 @@ def vectr(d, a, r, R, n1, n2):
         # ここでtの値が導出(解の公式より)
         t1 = (-B - np.sqrt(discriminant)) / A
         t2 = (-B + np.sqrt(discriminant)) / A
-
-        if R > 0:
-            t = np.min([t1, t2])
-        else:
-            t = np.max([t1, t2])
+        t = np.min([t1, t2]) if R > 0 else np.max([t1, t2])
 
         # 交点の座標:p(x,y,z)=a+td
         p0 = a + t * d
 
-    if R > 0:
-        hosen = p0 - r
-    else:
-        hosen = r - p0
+    hosen = (p0 - r) if R > 0 else (r - p0)
 
     # 屈折ベクトルを計算する前準備
     Dx = d / np.sqrt(np.dot(d, d))
     hosen = hosen / np.sqrt(np.dot(hosen, hosen))
-    # ref_vect = (n1 / n2) * Dx - (n1 / n2) * (np.dot(Dx, hosen) + np.sqrt((n2 / n1)**2 - 1 + np.dot(Dx, hosen)**2)) * hosen
-    ref_vect = ((n1 / n2) * Dx
-                - (n1 / n2) * hosen * (np.dot(Dx, hosen)
-                                       + np.sqrt((n2 / n1)**2
-                                                 - 1
-                                                 + np.dot(Dx, hosen)**2)
-                                       )
+    n = n1 / n2
+    ref_vect = (n * Dx - n * hosen * (np.dot(Dx, hosen) +
+                                      np.sqrt((1 / n)**2 - 1 + np.dot(Dx, hosen)**2)
+                                      )
                 )
 
     # r 球の中心
@@ -131,23 +121,13 @@ for j in range(0, 99, 1):  # 画角を0~2.29244 degまで振る
     SCA[j] = z_imagey[j] - z_imagey[0]  # 球面収差
 
     # 球面収差の計算その２
-    # value = point[j, 2]+ ref_vector[j,2]*point[j, 1]/abs(ref_vector[j,1])
-    # value_axis =point[0, 2]+ ref_vector[0,2]*point[0, 1]/abs(ref_vector[0,1])
-    # SCA2[j]=value- value_axis
-
+    # value = point[j, 2] + ref_vector[j, 2] * point[j, 1] / abs(ref_vector[j, 1])
+    # value_axis = point[0, 2] + ref_vector[0, 2] * point[0, 1] / abs(ref_vector[0, 1])
+    # SCA2[j] = value - value_axis
 
 # SCAを描画する
-'''
-print(point[98])
-print(ref_vector[98])
-value = point[98, 2]+ ref_vector[98,2]*point[98, 1]/abs(ref_vector[98,1])
-value_axis =point[0, 2]+ ref_vector[0,2]*point[0, 1]/abs(ref_vector[0,1])
-SCA2[98]=value- value_axis
-'''
-
 Functions.plotSCA(SCA)
 # Functions.plotSCA(SCA2)
-
 
 tracker = (list2_cross_pos, list3_ref_vector)
 np.savetxt('球面収差.txt', SCA)
