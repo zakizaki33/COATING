@@ -1,149 +1,144 @@
 import numpy as np
-# import matplotlib.pyplot as plt
+import Functions
 
 
 def vectr(d, a, r, R, n1, n2):
-    # d(xd yd zd) :方向ベクトル，a(xa ya za): 位置ベクトル，
-    # r(xr yr zr) :球の中心 球の半径:R,屈折率:n1,n2
-    # At^2+2Bt+C=0より
-    A = d[0]**2 + d[1]**2 + d[2]**2
-    B = (a[0] - r[0]) * d[0] + (a[1] - r[1]) * d[1] + (a[2] - r[2]) * d[2]
-    C = (a[0] - r[0])**2 + (a[1] - r[1])**2 + (a[2] - r[2])**2 - R**2
-    # print(A,B,C)
+    # d(xd yd zd) :方向ベクトル
+    # a(xa ya za) :位置ベクトル
+    # r(xr yr zr) :球の中心
+    # R           :球の半径
+    # n1,n2       :屈折率
 
-    if B**2 - A * C < 0:
-        print(B**2 - A * C)
-        print("解なし")
+    # At^2+2Bt+C=0より
+    A = np.dot(d, d)
+    B = np.dot(a - r, d)
+    C = np.dot(a - r, a - r) - R**2
+
+    discriminant = B**2 - A * C
+    if discriminant < 0:
+        print("解なし エラー発生")
         exit()
     else:
-        t = np.array(((-B + (B**2 - A * C)**0.5) / A,
-                      (-B - (B**2 - A * C)**0.5) / A), float)
-        # print(t)#ここでtの値が導出(解の公式より)
-        # t=int(np.amin(t>0))
+        # ここでtの値が導出(解の公式より)
+        t1 = (-B - np.sqrt(discriminant)) / A
+        t2 = (-B + np.sqrt(discriminant)) / A
+        t = np.min([t1, t2]) if R > 0 else np.max([t1, t2])
 
-        if R > 0:
-            t = np.min(t)
-            # print(t)
-        else:
-            t = np.max(t)
-            # print (t)
-        # print(t)
-        # exit()
-
-        p0 = np.array((a[0] + t * d[0], a[1] + t * d[1], a[2] + t * d[2]))
         # 交点の座標:p(x,y,z)=a+td
-        # p1=np.array((xa+t[1]*xd,ya+t[1]*yd,za+t[1]*zd))
+        p0 = a + t * d
 
-        # print(P)
-    D = np.array((p0[0], p0[1], p0[2]))  # 交点座標
-    RO = np.array((r[0], r[1], r[2]))  # 球の中心座標
+    hosen = (p0 - r) if R > 0 else (r - p0)
 
-    if R > 0:
-        hosen = D - RO
-    else:
-        hosen = RO - D
-
-    Dx = d / (d[0]**2 + d[1]**2 + d[2]**2)**0.5
-    hosen = hosen / (hosen[0]**2 + hosen[1]**2 + hosen[2]**2)**0.5
-    # print(hosen)
-    # print("法線ベクトル")
-    # 屈折ベクトル
-    p1 = ((n1 / n2) * Dx - (n1 / n2) * (np.dot(Dx, hosen) + (
-        ((n2 / n1)**2 - 1 + ((np.dot(Dx, hosen))**2))**0.5))) * hosen
+    # 屈折ベクトルを計算する前準備
+    Dx = d / np.sqrt(np.dot(d, d))
+    hosen = hosen / np.sqrt(np.dot(hosen, hosen))
+    n = n1 / n2
+    ref_vect = (n * Dx - n * hosen * (np.dot(Dx, hosen) +
+                                      np.sqrt((1 / n)**2 -
+                                      1 +
+                                      np.dot(Dx, hosen)**2)
+                                      )
+                )
 
     # r 球の中心
-    # D 交点座標
-    # p1 屈折ベクトル
-    return (r, D, p1)
-
-    # P=np.min(P[:,2]>0)
+    # p0 交点座標
+    # ref_vect 屈折ベクトル
+    return (r, p0, ref_vect)
 
 
-# ここにパラメータを入力（axis=0方向:第i面　axis=1方向:曲率，屈折率，厚み）
 # レンズデータ
-data = np.array([(11.050, 1.74, 5.50),
-                 (22.680, 1, 0.450),
-                 (-29.530, 1.74, 0.850),
-                 (11.580, 1, 1.660),
-                 (27.530, 1.74, 1.600),
-                 (-18.100, 1, 46.700),
-                 (1000000, 1, 10000)],
-                float)
+a0 = np.array((0, 0, 0))
+d0 = 100
+n0 = 1
+# ここにパラメータを入力（axis=0方向:第i面　axis=1方向:曲率，屈折率，厚み）
+lens_data = np.array([(11.050, 1.744003267, 5.50),
+                      (22.680, 1, 0.450),
+                      (-29.530, 1.7400050237, 0.850),
+                      (11.580, 1, 1.660),
+                      (27.530, 1.744003267, 1.600),
+                      (-18.100, 1, 46.700),
+                      (1000000, 1, 10000)],
+                     float)
 # レンズ面の数
-number = np.shape(data)[0]
+number = np.shape(lens_data)[0]
 
-# 0面
-point = np.zeros((99, 3), float)
-ref_vector = np.zeros((99, 3), float)
-zz = np.zeros((99, 1), float)
-z_imagey = np.zeros((99, 1), float)
-SCA = np.zeros((99, 1), float)
-D0 = np.zeros((99, 3), float)
-# deg=np.linspace(2.29244,2.29244,1)
-deg = np.linspace(0, 2.29244, 100)
+# 画角の範囲
+deg = np.linspace(0.000001, 2.292442776, 99)
+D0 = np.transpose(np.array([np.zeros(99),
+                            np.sin(np.radians(deg)),
+                            np.cos(np.radians(deg))]))
 
+# 数値置き場
+list1_radius_pos = np.zeros((number, 3))  # 球の中心
+list2_cross_pos = np.zeros((number, 3))  # 交点
+list3_ref_vector = np.zeros((number, 3))  # 屈折ベクトル
 
-for x in range(0, 99, 1):
-    D0[x] = np.array((0, np.sin(deg[x] * np.pi / 180),
-                      np.cos(deg[x] * np.pi / 180)))  # 画角
-    a0 = np.array((0, 0, 0))
-    d0 = 100
-    n0 = 1
+# 収差計算に関するパラメータを入れる枠
+point = np.zeros((99, 3), float)  # 交点(像面-1 面)
+ref_vector = np.zeros((99, 3), float)  # 屈折ベクトル（像面-1 面）
+zz = np.zeros((99, 1), float)  # z補正
+z_imagey = np.zeros((99, 1), float)  # 中心軸との交点　（像面付近）
 
-    anglenumber = np.shape(D0[x])[0]
+SCA = np.zeros((99, 1), float)  # 球面収差
+# SCA2 = np.zeros((99, 1), float)  # 球面収差
 
-    # 数値置き場
-    list1 = np.zeros((number - 1, 3))  # 球の中心
-    list2 = np.zeros((number - 1, 3))  # 交点
-    list3 = np.zeros((number - 1, 3))  # 屈折ベクトル
-    r1 = np.array((a0[0], a0[1], d0 + data[0, 0]))  # １面球の中心
+for j in range(0, 99, 1):  # 画角を0~2.29244 degまで振る
 
-    # 物体面から第1面までは別計算
-    p1 = vectr(D0[x], a0, r1, data[0, 0], n0, data[0, 1])
-    # print(p1)
-    list1[0] = p1[0]  # 1面の球の中心
-    list2[0] = p1[1]  # 1面の交点
-    list3[0] = p1[2]  # 1面の屈折ベクトル
+    refract_info = vectr(D0[j],
+                         a0,
+                         np.array((a0[0], a0[1], d0 + lens_data[0, 0])),
+                         lens_data[0, 0],
+                         n0,
+                         lens_data[0, 1])
+
+    list1_radius_pos[0] = refract_info[0]  # 1面の球の中心
+    list2_cross_pos[0] = refract_info[1]  # 1面の交点
+    list3_ref_vector[0] = refract_info[2]  # 1面の屈折ベクトル
 
     # 第1面以降の計算
-    for i in range(0, number - 2, 1):
-        rx = np.array((list1[i, 0],
-                       list1[i, 1],
+    for i in range(0, number - 1, 1):
+        rx = np.array((list1_radius_pos[i, 0],
+                       list1_radius_pos[i, 1],
                        # i面の球の中心
-                       d0 + np.sum(data[:i + 1, 2]) + data[i + 1, 0]))
-                     
-        px = vectr(list3[i, :],
-                   list2[i, :],
-                   rx,
-                   data[i + 1, 0],
-                   data[i, 1],
-                   data[i + 1, 1])  # i-1_i面の光線追跡
-        list1[i + 1] = px[0]  # i面の球の中心
-        list2[i + 1] = px[1]  # i面の交点
-        list3[i + 1] = px[2]  # i面の屈折ベクトル
-    
-    print("i面の交点 x, y, z")
-    print(list2)
-    # print(list3)
-    # exit()
-    
-    '''
+                       d0 + np.sum(lens_data[:i + 1, 2]) + lens_data[i + 1, 0])
+                      )
+
+        refract_info = vectr(list3_ref_vector[i, :],
+                             list2_cross_pos[i, :],
+                             rx,
+                             lens_data[i + 1, 0],
+                             lens_data[i, 1],
+                             lens_data[i + 1, 1])  # i-1_i面の光線追跡
+
+        list1_radius_pos[i + 1] = refract_info[0]  # i面の球の中心
+        list2_cross_pos[i + 1] = refract_info[1]  # i面の交点
+        list3_ref_vector[i + 1] = refract_info[2]  # i面の屈折ベクトル
+
+    print("Trial", j, "times")
+    print("Surface Intersection Point (x, y, z):")
+    print(list2_cross_pos)
+
     # 球面収差の計算
-    point[x] = list2[number - 2, :]
-    ref_vector[x] = list3[number - 2, :]
+    point[j] = list2_cross_pos[number - 2, :]  # （像面-1）面の交点
+    ref_vector[j] = list3_ref_vector[number - 2, :]  # （像面-1）面の屈折ベクトル
 
-    zz[x] = ref_vector[x, 2] - ref_vector[0, 2]
-    z_imagey[x] = np.dot(point[x, 2], point[x, 1]) / ref_vector[x, 2]
-    SCA[x] = z_imagey[x] - zz[x]
+    zz[j] = point[j, 2] - point[0, 2]  # z補正
+    z_imagey[j] = np.dot(point[j, 1], ref_vector[j, 1]) / ref_vector[j, 2] - zz[j]  # 中心軸交点
+    SCA[j] = z_imagey[j] - z_imagey[0]  # 球面収差
+
+    # 球面収差の計算その２
+    '''
+    value = point[j, 2] + (ref_vector[j, 2] * point[j, 1] /
+                           abs(ref_vector[j, 1]))
+    value_axis = point[0, 2] + (ref_vector[0, 2] * point[0, 1] /
+                                abs(ref_vector[0, 1]))
+    SCA2[j] = value - value_axis
     '''
 
-# print(SCA)
-# plt.plot(SCA)
-# plt.show()
+# SCAを描画する
+Functions.plotSCA(SCA)
+# Functions.plotSCA(SCA2)
 
-# tracker=(list2,list3)
-
-# np.savetxt('球面収差.txt', SCA)
-# np.savetxt('光線追跡vector.txt',tracker[1])
-
-# 変更させてみる（やまざき　2023-10-04）
+tracker = (list2_cross_pos, list3_ref_vector)
+np.savetxt('球面収差.txt', SCA)
+np.savetxt('光線追跡vector.txt', tracker[1])
