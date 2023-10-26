@@ -36,9 +36,7 @@ def vectr(d, a, r, R, n1, n2):
     ref_vect = (n * Dx - n * hosen * (np.dot(Dx, hosen) +
                                       np.sqrt((1 / n)**2 -
                                       1 +
-                                      np.dot(Dx, hosen)**2)
-                                      )
-                )
+                                      np.dot(Dx, hosen)**2)))
 
     # r 球の中心
     # p0 交点座標
@@ -76,11 +74,7 @@ def main():
     # 収差計算に関するパラメータを入れる枠
     point = np.zeros((99, 3), float)  # 交点(像面-1 面)
     ref_vector = np.zeros((99, 3), float)  # 屈折ベクトル（像面-1 面）
-    zz = np.zeros((99, 1), float)  # z補正
-    z_imagey = np.zeros((99, 1), float)  # 中心軸との交点　（像面付近）
-
     SCA = np.zeros((99, 1), float)  # 球面収差
-    SCA2 = np.zeros((99, 1), float)  # 球面収差
 
     for j in range(0, 99, 1):  # 画角を0~2.29244 degまで振る
 
@@ -121,23 +115,14 @@ def main():
         # 球面収差の計算
         point[j] = list2_cross_pos[number - 2, :]  # （像面-1）面の交点
         ref_vector[j] = list3_ref_vector[number - 2, :]  # （像面-1）面の屈折ベクトル
-
-        zz[j] = point[j, 2] - point[0, 2]  # z補正
-        z_imagey[j] = np.dot(point[j, 1], ref_vector[j, 1]) / ref_vector[j, 2] - zz[j]  # 中心軸交点
-        SCA[j] = z_imagey[j] - z_imagey[0]  # 球面収差
-
-        # 球面収差の計算その２
-        
         value = point[j, 2] + (ref_vector[j, 2] * point[j, 1] /
-                            abs(ref_vector[j, 1]))
+                               abs(ref_vector[j, 1]))
         value_axis = point[0, 2] + (ref_vector[0, 2] * point[0, 1] /
                                     abs(ref_vector[0, 1]))
-        SCA2[j] = value - value_axis
-        
-
+        SCA[j] = value - value_axis
+ 
     # SCAを描画する
     Functions.plotSCA(SCA)
-    Functions.plotSCA(SCA2)
 
     tracker = (list2_cross_pos, list3_ref_vector)
     np.savetxt('球面収差.txt', SCA)
@@ -145,6 +130,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-    print("コミットをもどす練習 2023-10-25")
+ 
     
 
