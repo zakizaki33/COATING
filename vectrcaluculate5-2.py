@@ -33,15 +33,15 @@ def vectr(d, a, r, R, n1, n2):
     Dx = d / np.sqrt(np.dot(d, d))
     hosen = hosen / np.sqrt(np.dot(hosen, hosen))
     n = n1 / n2
+    # 屈折ベクトルを計算
     ref_vect = (n * Dx - n * hosen * (np.dot(Dx, hosen) +
                                       np.sqrt((1 / n)**2 -
                                       1 +
                                       np.dot(Dx, hosen)**2)))
 
-    # r 球の中心
     # p0 交点座標
     # ref_vect 屈折ベクトル
-    return (r, p0, ref_vect)
+    return (p0, ref_vect)
 
 def main():
     # レンズデータ
@@ -55,14 +55,13 @@ def main():
                         (11.580, 1, 1.660),
                         (27.530, 1.744003267, 1.600),
                         (-18.100, 1, 46.700),
-                        (1000000, 1, 10000)],
-                        float)
+                        (1000000, 1, 10000)])
     # レンズ面の数
     number = np.shape(lens_data)[0]
 
     # 画角の範囲
     deg = np.linspace(0.000001, 2.292442776, 99)
-    D0 = np.transpose(np.array([np.zeros(99),
+    direction = np.transpose(np.array([np.zeros(99),
                                 np.sin(np.radians(deg)),
                                 np.cos(np.radians(deg))]))
 
@@ -77,17 +76,17 @@ def main():
     SCA = np.zeros((99, 1), float)  # 球面収差
 
     for j in range(0, 99, 1):  # 画角を0~2.29244 degまで振る
-
-        refract_info = vectr(D0[j],
+        r0 = (a0[0], a0[1], d0 + lens_data[0, 0])
+        refract_info = vectr(direction[j],
                             a0,
-                            np.array((a0[0], a0[1], d0 + lens_data[0, 0])),
+                            r0,
                             lens_data[0, 0],
                             n0,
                             lens_data[0, 1])
 
-        list1_radius_pos[0] = refract_info[0]  # 1面の球の中心
-        list2_cross_pos[0] = refract_info[1]  # 1面の交点
-        list3_ref_vector[0] = refract_info[2]  # 1面の屈折ベクトル
+        list1_radius_pos[0] = r0  # 1面の球の中心
+        list2_cross_pos[0] = refract_info[0]  # 1面の交点
+        list3_ref_vector[0] = refract_info[1]  # 1面の屈折ベクトル
 
         # 第1面以降の計算
         for i in range(0, number - 1, 1):
@@ -102,11 +101,11 @@ def main():
                                 rx,
                                 lens_data[i + 1, 0],
                                 lens_data[i, 1],
-                                lens_data[i + 1, 1])  # i-1_i面の光線追跡
+                                lens_data[i + 1, 1])
 
-            list1_radius_pos[i + 1] = refract_info[0]  # i面の球の中心
-            list2_cross_pos[i + 1] = refract_info[1]  # i面の交点
-            list3_ref_vector[i + 1] = refract_info[2]  # i面の屈折ベクトル
+            list1_radius_pos[i + 1] = rx
+            list2_cross_pos[i + 1] = refract_info[0]  # i面の交点
+            list3_ref_vector[i + 1] = refract_info[1]  # i面の屈折ベクトル
 
         print("Trial", j, "times")
         print("Surface Intersection Point (x, y, z):")
